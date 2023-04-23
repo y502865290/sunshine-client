@@ -6,7 +6,7 @@
 .content {
   width: 100vw;
   height: 100vh;
-  background-color: #eeeeee;
+  background-image: url('../image/login.png');
   display: flex;
   justify-content: center;
   align-items: center;
@@ -20,7 +20,7 @@
 }
 .content .content-wrapper .nav {
   height: 80%;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 1);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -119,7 +119,7 @@
 .content .content-wrapper .form {
   width: 35%;
   height: 80%;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.7);
 }
 .content .content-wrapper .form .form-wrapper {
   width: 100%;

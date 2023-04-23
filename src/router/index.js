@@ -2,28 +2,88 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
 import Main from '../views/Main.vue'
 import Search from '../views/Search.vue'
+import SicknessDetail from '../views/SicknessDetail'
+import PersonalMain from '../views/personInfo/PersonalMain'
+import UserInfo from'../views/personInfo/UserInfo'
+import Test from '../views/Test'
 
 const routes = [
   {
-    path: '/',
+    path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta:{
+      check:false
+    }
   },
   {
-    path: '/main',
+    path: '/',
     name: 'Main',
-    component: Main
+    component: Main,
+    meta:{
+      check:false
+    }
   },
   {
     path: '/search',
-    name: 'search',
-    component: Search
+    name: 'Search',
+    component: Search,
+    meta:{
+      check:false
+    }
+  },
+  {
+    path: '/detail',
+    name: 'SicknessDetail',
+    component: SicknessDetail,
+    meta:{
+      check:false
+    }
+  },
+  {
+    path: '/personalMain',
+    name: 'PersonalMain',
+    component: PersonalMain,
+    meta:{
+      check:true
+    },
+    children: [
+      {
+        path: 'userInfo',
+        name: 'UserInfo',
+        component: UserInfo,
+        meta:{
+          check:true
+        }
+      }
+    ]
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: Test,
+    meta:{
+      check:false
+    }
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to,from,next)=>{
+  if(!to.meta.check){
+    next()
+  }else{
+    let token = localStorage.getItem('accessToken')
+    if(token){
+      next()
+    }else{
+      next('/login')
+    }
+  }
 })
 
 export default router

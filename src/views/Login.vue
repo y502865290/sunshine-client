@@ -16,14 +16,14 @@
             <div class="center">
                 <div class="signin-img-wrapper" ref="signInImgWrapper">
                     <div class="img-tips">
-                        <h1>Start Your Work</h1>
-                        <h5>One Key adn there links</h5>
+                        <!-- <h1>Start Your Work</h1>
+                        <h5>One Key adn there links</h5> -->
                     </div>
                 </div>
                 <div class="signup-img-wrapper" ref="signUpImgWrapper" >
                     <div class="img-tips">
-                        <h1>Start Your Work</h1>
-                        <h5>One Key adn there links</h5>
+                        <!-- <h1>Start Your Work</h1>
+                        <h5>One Key adn there links</h5> -->
                     </div>
                 </div>
             </div>
@@ -38,10 +38,12 @@
                             <span>使用其他方式登录:</span>
                             <span @click="toUseUsername">用户名</span>
                         </div>
-                            <t-radio-group variant="primary-filled" default-value="1" 
-                                            v-model:value="userType" 
-                                            style="background-color:aliceblue;"
-                                            @change="log">
+                            <t-radio-group 
+                                variant="primary-filled" 
+                                default-value="1" 
+                                v-model:value="userType" 
+                                style="background-color:aliceblue;"
+                            >
                                 <t-radio-button value="1" >医生</t-radio-button>
                                 <t-radio-button value="2">普通用户</t-radio-button>
                             </t-radio-group>
@@ -68,10 +70,12 @@
                             <span @click="toLogin">登录</span>
                         </div>
                         <div class="inputs-wrapper">
-                            <t-radio-group variant="primary-filled" default-value="1" 
+                            <t-radio-group 
+                                variant="primary-filled" 
+                                default-value="1" 
                                             v-model:value="userType" 
                                             style="background-color:aliceblue;"
-                                            @change="log">
+                            >
                                 <t-radio-button value="1" >医生</t-radio-button>
                                 <t-radio-button value="2">普通用户</t-radio-button>
                             </t-radio-group>
@@ -96,9 +100,10 @@
     </div>
 </template>
 <script setup>
-    import '../assets/css/style.css'
     import {ref, reactive, getCurrentInstance} from 'vue'
     import { Icon } from 'tdesign-icons-vue-next';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
     const pageInstance = getCurrentInstance();
     const proxy = pageInstance.proxy
     const signInForm = ref(null)
@@ -113,6 +118,7 @@
     const passwordAnimation = ref(null)
     const signInAnimation = ref(null)
     const useEmail = ref(false)
+    const router = useRouter()
 
     let animationList = []
     animationList.push(titleAnimation)
@@ -171,7 +177,7 @@
      * 登录注册
      */
     const userType = ref('1');
-    const loginUser = reactive({username:null,password:null,email:null})
+    const loginUser = reactive({username:null,password:null,email:null,type:null})
     const signUpUser = reactive({username:null,password:null,email:null})
 
     const signUp = function(){
@@ -182,17 +188,36 @@
     }
 
     const login = function(){
+        loginUser.type = Number(userType)
         if(!useEmail.value){
             loginUser.email = null
             proxy.$axios.post(proxy.$url.umsUserUrl + '/loginWithUsername',loginUser).then((res)=>{
-                proxy.$analysisResult(proxy,res)
+                const result = proxy.$analysisResult(proxy,res)
+                if(result.code === 1){
+                    initData(result.data)
+                }
             })
         }else{
             loginUser.username = null
             proxy.$axios.post(proxy.$url.umsUserUrl + '/loginWithEmail',loginUser).then((res)=>{
-                proxy.$analysisResult(proxy,res)
+                const result = proxy.$analysisResult(proxy,res)
+                if(result.code === 1){
+                    initData(result.data)
+                }
             })
         }
 
     }
+
+    const store = useStore()
+
+    const initData = (data) => {
+        let tokenInfo = JSON.parse(data.tokenInfo)
+        localStorage.setItem('accessToken',tokenInfo.accessToken)
+        localStorage.setItem('refreshToken',tokenInfo.refreshToken)
+        localStorage.setItem('expiresTime',tokenInfo.expiresTime)
+        store.commit('setUserInfo',JSON.parse(data.data))
+        router.push({name:'UserInfo'})
+    }
 </script>
+<style src="@/assets/css/login.css" scoped></style>
