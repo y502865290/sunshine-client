@@ -102,8 +102,8 @@
 <script setup>
     import {ref, reactive, getCurrentInstance} from 'vue'
     import { Icon } from 'tdesign-icons-vue-next';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
+    import { useStore } from 'vuex';
+    import { useRouter } from 'vue-router';
     const pageInstance = getCurrentInstance();
     const proxy = pageInstance.proxy
     const signInForm = ref(null)
@@ -188,7 +188,7 @@ import { useRouter } from 'vue-router';
     }
 
     const login = function(){
-        loginUser.type = Number(userType)
+        loginUser.type = Number(userType.value)
         if(!useEmail.value){
             loginUser.email = null
             proxy.$axios.post(proxy.$url.umsUserUrl + '/loginWithUsername',loginUser).then((res)=>{
@@ -217,7 +217,11 @@ import { useRouter } from 'vue-router';
         localStorage.setItem('refreshToken',tokenInfo.refreshToken)
         localStorage.setItem('expiresTime',tokenInfo.expiresTime)
         store.commit('setUserInfo',JSON.parse(data.data))
-        router.push({name:'UserInfo'})
+        store.commit('updateRecordInfo',{proxy,recall:go,store})
+        function go(){
+            router.push({name:'UserInfo'})
+        }
+        
     }
 </script>
 <style src="@/assets/css/login.css" scoped></style>

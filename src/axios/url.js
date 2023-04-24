@@ -3,5 +3,6 @@ const medicalModuleUrl = 'http://localhost:7001/mms'
 const url = {
     umsUserUrl:userModuleUrl + '/user',
     mmsSicknessUrl: medicalModuleUrl + '/sickness',
+    umsRecordUrl:userModuleUrl + '/record'
 }
 export default url

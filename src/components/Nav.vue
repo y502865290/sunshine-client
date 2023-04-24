@@ -30,7 +30,11 @@
                     <t-button variant="text" shape="square" @click="toUserInfo">
                         <template #icon><t-icon name="user" /></template>
                     </t-button>
-                    <t-avatar image="https://tdesign.gtimg.com/site/avatar.jpg" size="39px" style="margin-left: 10px" />
+                    <t-avatar 
+                        :image="store.getters.getUserAvator" 
+                        size="39px" 
+                        style="margin-left: 10px;cursor: pointer;"
+                        @click="toUserInfo"  />
                     <t-dropdown :min-column-width="120" trigger="click" v-if="store.getters.getUserId">
                         <template #dropdown>
                             <t-dropdown-menu>

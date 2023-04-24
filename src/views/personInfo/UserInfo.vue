@@ -1,5 +1,5 @@
 <template>
-    
+    <div style="overflow-y: scroll;height: 92vh;">
     <t-row :gutter="[24,24]" class="contain">
         <t-col :flex="3">
 
@@ -40,10 +40,79 @@
                 </t-row>
             </t-card>
 
+            <t-card class="user-info-list" title="医疗相关信息" :bordered="false">
+                <template #actions>
+                    <t-dropdown trigger="click" :min-column-width="120">
+                        <template #dropdown>
+                            <t-dropdown-menu>
+                                <t-dropdown-item @click="toUpdateRecord">
+                                    <t-icon name="edit-1"></t-icon>
+                                    修改医疗信息
+                                </t-dropdown-item>
+                            </t-dropdown-menu>
+                        </template>
+                        <t-button theme="default" shape="square" variant="text">
+                            <t-icon name="edit-1" />
+                        </t-button>
+                    </t-dropdown>
+
+                </template>
+                <t-row class="content" justify="space-between" v-if="recordInfo.length !== 0">
+                    <t-col class="contract" :span="3">
+                        <div class="contract-title">
+                        {{ recordInfo[0].title }}
+                        </div>
+                        <div class="contract-detail2">
+                        {{ recordInfo[0].content }}
+                        </div>
+                    </t-col>
+                    <t-col class="contract" :span="3">
+                        <div class="contract-title">
+                        {{ recordInfo[1].title }}
+                        </div>
+                        <div class="contract-detail2">
+                        {{ recordInfo[1].content }}
+                        </div>
+                    </t-col>
+                    <t-col class="contract" :span="3">
+                        <div class="contract-title">
+                        {{ recordInfo[2].title }}
+                        </div>
+                        <div class="contract-detail2">
+                        {{ recordInfo[2].content }}
+                        </div>
+                    </t-col>
+                </t-row>
+                <t-row class="content" justify="space-between" v-if="recordInfo.length !== 0">
+                    <t-col>
+                        <div class="contract-title">
+                        {{ recordInfo[3].title }}
+                        </div>
+                        <div class="contract-detail2">
+                        {{ recordInfo[3].content }}
+                        </div>
+                    </t-col>
+                </t-row>
+                <t-row class="content" justify="space-between" v-if="recordInfo.length !== 0">
+                    <t-col>
+                        <div class="contract-title">
+                        {{ recordInfo[4].title }}
+                        </div>
+                        <div class="contract-detail2">
+                        {{ recordInfo[4].content }}
+                        </div>
+                    </t-col>
+                </t-row>
+            </t-card>
+            <div style="height: 30px;"></div>
         </t-col>
         <t-col :flex="1">
             <t-card class="user-intro" :bordered="false">
-                <t-avatar size="80px" image="https://tdesign.gtimg.com/site/avatar.jpg"></t-avatar>
+                <t-avatar 
+                    size="80px" 
+                    :image="store.getters.getUserAvator"
+                    @click="toUploadAvator"
+                    style="cursor: pointer; "></t-avatar>
                 <div class="name">{{ store.getters.getUserInfo.username }}</div>
                 <div class="position">{{ store.getters.getUserInfo.type === 2 ? '普通用户' : '医生'}}</div>
             </t-card>
@@ -58,12 +127,15 @@
              </t-card>
         </t-col>
     </t-row>
+    
+</div>
 
     <t-dialog
         header="更新用户信息"
         :visible="updateVisible"
         close-btn=""
         :onConfirm="onConfirmUpdate"
+        :onCancel="onCancelUpdate"
     >
         <t-form
             ref="updateForm"
@@ -96,42 +168,129 @@
     </t-dialog>
 
     <t-dialog
-        header="初始化用户信息"
+        header="完善个人信息"
         :visible="initVisible"
         close-btn=""
         :onConfirm="onConfirmInit"
         :cancelBtn=null
+        top="20%"
     >
         <t-form
-            :data="userInfo"
+            :data="initInfo"
             ref="initForm"
             resetType="initial"
             @submit="onSubmitInit"
             :rules="rules"
+            
         >
             <t-form-item label="昵称" name="nickname">
-                <t-input placeholder="请输入内容" v-model="userInfo.nickname" />
+                <t-input placeholder="请输入内容" v-model="initInfo.nickname" />
             </t-form-item>
             <t-form-item label="姓氏" name="surname">
-                <t-input placeholder="请输入内容" v-model="userInfo.surname" />
+                <t-input placeholder="请输入内容" v-model="initInfo.surname" />
             </t-form-item>
             <t-form-item label="性别" name="sex">
-                <t-select v-model="userInfo.sex" placeholder="请选择性别">
+                <t-select v-model="initInfo.sex" placeholder="请选择性别">
                     <t-option :value=1 label="男"></t-option>
                     <t-option :value=0 label="女"></t-option>
                 </t-select>
             </t-form-item>
             <t-form-item label="电话号码" name="phone">
-                <t-input type="number" placeholder="请输入电话号码" v-model="userInfo.phone" />
+                <t-input type="number" placeholder="请输入电话号码" v-model="initInfo.phone" />
+            </t-form-item>
+            <t-form-item label="身高" name="stature">
+                <t-input-adornment append="cm">
+                    <t-input style="width:260px" placeholder="请输入身高" type="number" v-model="initInfo.stature"  />
+                </t-input-adornment>
+            </t-form-item>
+            <t-form-item label="体重" name="weight">
+                <t-input-adornment append="kg">
+                    <t-input style="width:260px" placeholder="请输入体重" type="number" v-model="initInfo.weight"  />
+                </t-input-adornment>
+            </t-form-item>
+            <t-form-item label="血型" name="blood">
+                <t-input placeholder="请输入血型" v-model="initInfo.blood" />
+            </t-form-item>
+            <t-form-item label="过敏史" name="allergy">
+                <t-textarea placeholder="请输入过敏史" v-model="initInfo.allergy" />
+            </t-form-item>
+            <t-form-item label="过往病史" name="sicknessHistory">
+                <t-textarea placeholder="请输入过往病史" v-model="initInfo.sicknessHistory" />
             </t-form-item>
         </t-form>
+    </t-dialog>
+
+    <t-dialog
+        header="更改医疗信息"
+        :visible="updateRecordVisible"
+        close-btn=""
+        :onConfirm="onConfirmUpdateRecord"
+        :onCancel="onCancelUpdateRecord"
+    >
+        <t-form
+            :data="updateRecord"
+            ref="updateRecordForm"
+            resetType="initial"
+            @submit="onSubmitUpdateRecord"
+            :rules="rules"
+        >
+            <t-form-item label="身高" name="stature">
+                <t-input-adornment append="cm">
+                    <t-input style="width:260px" placeholder="请输入身高" type="number" v-model="updateRecord.stature"  />
+                </t-input-adornment>
+            </t-form-item>
+            <t-form-item label="体重" name="weight">
+                <t-input-adornment append="kg">
+                    <t-input style="width:260px" placeholder="请输入体重" type="number" v-model="updateRecord.weight"  />
+                </t-input-adornment>
+            </t-form-item>
+            <t-form-item label="血型" name="blood">
+                <t-input placeholder="请输入血型" v-model="updateRecord.blood" />
+            </t-form-item>
+            <t-form-item label="过敏史" name="allergy">
+                <t-textarea placeholder="请输入过敏史" v-model="updateRecord.allergy" />
+            </t-form-item>
+            <t-form-item label="过往病史" name="sicknessHistory">
+                <t-textarea placeholder="请输入过往病史" v-model="updateRecord.sicknessHistory" />
+            </t-form-item>
+        </t-form>
+    </t-dialog>
+
+    <t-dialog
+        header="更换头像"
+        :visible="avatorVisible"
+        :onCancel="onCancelUpload"
+        cancelBtn="返回"
+        close-btn=""
+        width="15vw"
+        :confirmBtn="null"
+    >
+        <t-upload
+            ref="uploadImage"
+            v-model="avator"
+            style="margin-left:10%;margin-right: 10%;"
+            action="http://localhost:7000/ums/user/uploadAvator"
+            theme="image"
+            tips="头像上传"
+            accept="image/*"
+            :auto-upload="true"
+            :upload-all-files-in-one-request="true"
+            :headers="getToken()"
+            :locale="{
+                triggerUploadText: {
+                    image: '请选择图片',
+                },
+            }"
+            :formatResponse="formatResponse"
+        >
+        </t-upload>
     </t-dialog>
 
     
 </template>
 <script setup>
     import { useStore } from "vuex"
-    import { getCurrentInstance, reactive, ref } from 'vue'
+    import { getCurrentInstance, reactive, ref, watch } from 'vue'
     import { useRouter } from "vue-router"
     import { MessagePlugin } from 'tdesign-vue-next'
 
@@ -140,9 +299,11 @@
     const router = useRouter()
     const proxy = getCurrentInstance().proxy
     const userUrl = proxy.$url.umsUserUrl
+    const recordUrl = proxy.$url.umsRecordUrl
 
     const initPersonalInfo = () => {
         const userInfo = store.getters.getUserInfo
+        personalInfo.value = []
         personalInfo.value.push({title:'用户名',content:userInfo.username})
         personalInfo.value.push({title:'昵称',content:userInfo.nickname})
         personalInfo.value.push({title:'姓氏',content:userInfo.surname})
@@ -159,16 +320,23 @@
             router.push({name:'Login'})
         }
         initPersonalInfo()
+        initRecordInfo()
     }
 
     const initVisible = ref(store.getters.getUserInfo.init === 1 ? false : true)
     const initForm = ref(null)
-    const userInfo = reactive({
+    const initInfo = reactive({
         id:undefined,
         phone:undefined,
         sex:1,
         surname:undefined,
-        nickname:undefined
+        nickname:undefined,
+        stature:undefined,
+        weight:undefined,
+        allergy:undefined,
+        blood:undefined,
+        user:undefined,
+        sicknessHistory:undefined
     })
     const rules = {
         nickname:[
@@ -186,6 +354,22 @@
         surname:[
             {required:true,message:'姓氏必填',type:'error',trigger:'change'},
             {required:true,message:'姓氏必填',type:'error',trigger:'blur'}
+        ],
+        stature:[
+            {required:true,message:'身高必填',type:'error',trigger:'change'},
+            {required:true,message:'身高必填',type:'error',trigger:'blur'}
+        ],
+        weight:[
+            {required:true,message:'体重必填',type:'error',trigger:'change'},
+            {required:true,message:'体重必填',type:'error',trigger:'blur'}
+        ],
+        blood:[
+            {required:true,message:'血型必填',type:'error',trigger:'change'},
+            {required:true,message:'血型必填',type:'error',trigger:'blur'}
+        ],
+        allergy:[
+            {required:true,message:'过敏史必填',type:'error',trigger:'change'},
+            {required:true,message:'过敏史必填',type:'error',trigger:'blur'}
         ]
     }
 
@@ -201,12 +385,31 @@
     const onSubmitInit = ({ validateResult,firstError,e }) => {
         e.preventDefault()
         if(validateResult === true){
+            let userInfo = {}
             userInfo.id = store.getters.getUserId
+            userInfo.phone = initInfo.phone
+            userInfo.sex = initInfo.sex
+            userInfo.surname = initInfo.surname
+            userInfo.nickname = initInfo.nickname
             proxy.$axios.post(userUrl + '/init',userInfo).then((res)=>{
                 const result = proxy.$analysisResult(proxy,res)
                 if(result.code === 1){
                     onCancelInit()
-                    getUserInfo()
+                    store.commit('updateUserInfo',{proxy,store})
+                }
+            })
+            let recordInfo = {}
+            recordInfo.sicknessHistory = initInfo.sicknessHistory
+            recordInfo.user = store.getters.getUserId
+            recordInfo.stature = Number(initInfo.stature)
+            recordInfo.weight = Number(initInfo.weight)
+            recordInfo.blood = initInfo.blood
+            recordInfo.allergy = initInfo.allergy
+            proxy.$axios.put(recordUrl + '/addRecord',recordInfo).then((res)=>{
+                const result = proxy.$analysisResult(proxy,res,true)
+                if(result.code === 1){
+                    onCancelInit()
+                    store.commit('updateRecordInfo',{proxy,store})
                 }
             })
         }else{
@@ -214,17 +417,7 @@
         }
     }
 
-    const getUserInfo = () => {
-        proxy.$axios.get(userUrl + '/getUserInfoByToken').then((res)=>{
-            const result = proxy.$analysisResult(proxy,res,true)
-            if(result.code === 1){
-                store.commit('setUserInfo',result.data)
-                initPersonalInfo()
-            }
-        })
-    }
-
-    const updateVisible = ref(true)
+    const updateVisible = ref(false)
     const updateUserInfo = reactive({
         email:null,
         sex:null,
@@ -268,16 +461,134 @@
         updateVisible.value = true
     }
 
+    const onConfirmUpdate = () => {
+        updateForm.value.submit()
+    }
+
     const onSubmitUpdate = ({ validateResult, firstError, e }) => {
         e.preventDefault()
         if(validateResult === true){
-            proxy.$axios.post(userUrl + '/update',updateUserInfo)
+            proxy.$axios.post(userUrl + '/update',updateUserInfo).then((res)=>{
+                const result = proxy.$analysisResult(proxy,res)
+                if(result.code === 1){
+                    store.commit('updateUserInfo',{proxy,store})
+                    onCancelUpdate()
+                }
+            })
         }else{
             MessagePlugin.warning(firstError)
         }
     }
 
+    const onCancelUpdate = () => {
+        updateForm.value.reset()
+        updateVisible.value = false
+    }
 
+    const avatorVisible = ref(false)
+    const avator = ref([{name:"头像.png",url:store.getters.getUserAvator}])
+    const uploadImage = ref(null)
+
+    const toUploadAvator = () => {
+        avator.value = [{name:"头像.png",url:store.getters.getUserAvator}]
+        avatorVisible.value = true
+    }
+
+    const onCancelUpload = () => {
+        avatorVisible.value = false
+    }
+
+    const getToken = () => {
+        let expiresTime = Number(localStorage.getItem('expiresTime'))
+        let refreshToken = localStorage.getItem('refreshToken')
+        let accessToken = localStorage.getItem('accessToken')
+        let headers = {}
+        if(expiresTime && accessToken && refreshToken){
+            let now = Date.now()
+            headers['access-token'] = accessToken
+            if(now >= expiresTime){
+            headers['refresh-token'] = refreshToken
+            }
+        }
+        return headers
+    }
+
+    const formatResponse = (res) => {
+        store.commit('updateUserInfo',{proxy,store})
+        return {url:res.data}
+    }
+
+    const recordInfo = ref([])
+
+    const initRecordInfo = () => {
+        recordInfo.value = []
+        let storeRecordInfo = store.getters.getRecordInfo
+        if(!storeRecordInfo || storeRecordInfo === {} || !storeRecordInfo.id){
+            return
+        }
+        recordInfo.value.push({title:'身高',content:storeRecordInfo.stature + 'cm'})
+        recordInfo.value.push({title:'体重',content:storeRecordInfo.weight + 'kg'})
+        recordInfo.value.push({title:'血型',content:storeRecordInfo.blood})
+        recordInfo.value.push({title:'过敏史',content:storeRecordInfo.allergy})
+        recordInfo.value.push({title:'疾病史',content:''})
+    }
+
+    const updateRecord = reactive({
+        id:null,
+        stature:null,
+        weight:null,
+        allergy:null,
+        blood:null,
+        user:null,
+        sicknessHistory:null
+    })
+    const updateRecordForm = ref(null)
+    const updateRecordVisible = ref(false)
+
+    const toUpdateRecord = () => {
+        let oldRecord = store.getters.getRecordInfo
+        updateRecord.id = oldRecord.id
+        updateRecord.user = oldRecord.user
+        updateRecord.stature = oldRecord.stature
+        updateRecord.weight = oldRecord.weight
+        updateRecord.sicknessHistory = oldRecord.sicknessHistory
+        updateRecord.allergy = oldRecord.allergy
+        updateRecord.blood = oldRecord.blood
+
+        updateRecordVisible.value = true
+    }
+    
+    const onCancelUpdateRecord = () => {
+        updateForm.value.reset()
+        updateRecordVisible.value = false
+    }
+
+    const onConfirmUpdateRecord = () => {
+        updateRecordForm.value.submit()
+    }
+
+    const onSubmitUpdateRecord = ({validateResult, firstError, e}) => {
+        e.preventDefault()
+        if(validateResult === true){
+            proxy.$axios.post(recordUrl + '/updateRecord',updateRecord).then((res)=>{
+                const result = proxy.$$analysisResult(proxy,res)
+                if(result.code === 1){
+                    store.commit('getRecordInfo',{proxy,store})
+                    onCancelUpdateRecord()
+                }
+            })
+        }else{
+            MessagePlugin.warning(firstError)
+        }
+    }
+
+    watch(()=>store.state.recordInfo,()=>{
+        initRecordInfo()
+    })
+
+    watch(()=>store.state.userInfo,()=>{
+        initPersonalInfo()
+    })
 
     init()
 </script>
