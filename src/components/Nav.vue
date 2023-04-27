@@ -31,7 +31,7 @@
                         <template #icon><t-icon name="user" /></template>
                     </t-button>
                     <t-avatar 
-                        :image="store.getters.getUserAvator" 
+                        :image="store.getters.getUserAvatar" 
                         size="39px" 
                         style="margin-left: 10px;cursor: pointer;"
                         @click="toUserInfo"  />

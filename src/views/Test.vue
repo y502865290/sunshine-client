@@ -9,8 +9,8 @@
     <t-button @click="exit">退出登录</t-button>
     <t-upload
         ref="uploadImage"
-        v-model="avator"
-        action="http://localhost:7000/ums/user/uploadAvator"
+        v-model="avatar"
+        action="http://localhost:7000/ums/user/uploadAvatar"
         theme="image"
         tips="头像上传"
         accept="image/*"
@@ -89,7 +89,7 @@
     }
 
     const uploadImage = ref(null)
-    const avator = ref([])
+    const avatar = ref([])
 
     const handleFail = () => {
         proxy.$message.error({content:'上传失败'})

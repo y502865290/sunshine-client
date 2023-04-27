@@ -110,8 +110,8 @@
             <t-card class="user-intro" :bordered="false">
                 <t-avatar 
                     size="80px" 
-                    :image="store.getters.getUserAvator"
-                    @click="toUploadAvator"
+                    :image="store.getters.getUserAvatar"
+                    @click="toUploadAvatar"
                     style="cursor: pointer; "></t-avatar>
                 <div class="name">{{ store.getters.getUserInfo.username }}</div>
                 <div class="position">{{ store.getters.getUserInfo.type === 2 ? '普通用户' : '医生'}}</div>
@@ -258,7 +258,7 @@
 
     <t-dialog
         header="更换头像"
-        :visible="avatorVisible"
+        :visible="avatarVisible"
         :onCancel="onCancelUpload"
         cancelBtn="返回"
         close-btn=""
@@ -267,9 +267,9 @@
     >
         <t-upload
             ref="uploadImage"
-            v-model="avator"
+            v-model="avatar"
             style="margin-left:10%;margin-right: 10%;"
-            action="http://localhost:7000/ums/user/uploadAvator"
+            action="http://localhost:7000/ums/user/uploadAvatar"
             theme="image"
             tips="头像上传"
             accept="image/*"
@@ -485,17 +485,17 @@
         updateVisible.value = false
     }
 
-    const avatorVisible = ref(false)
-    const avator = ref([{name:"头像.png",url:store.getters.getUserAvator}])
+    const avatarVisible = ref(false)
+    const avatar = ref([{name:"头像.png",url:store.getters.getUserAvatar}])
     const uploadImage = ref(null)
 
-    const toUploadAvator = () => {
-        avator.value = [{name:"头像.png",url:store.getters.getUserAvator}]
-        avatorVisible.value = true
+    const toUploadAvatar = () => {
+        avatar.value = [{name:"头像.png",url:store.getters.getUserAvatar}]
+        avatarVisible.value = true
     }
 
     const onCancelUpload = () => {
-        avatorVisible.value = false
+        avatarVisible.value = false
     }
 
     const getToken = () => {

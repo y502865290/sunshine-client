@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
 import createPersistedstate from 'vuex-persistedstate'
-import defaultAvator from '../assets/image/default_avator.jpg'
+import defaultAvatar from '../assets/image/default_avatar.jpg'
 
 export default createStore({
   state: {
@@ -13,7 +13,7 @@ export default createStore({
       status:null,
       email:null,
       sex:null,
-      avator:null,
+      avatar:null,
       surname:null,
       init:null
     },
@@ -30,11 +30,11 @@ export default createStore({
   getters:{
     getUserInfo:(state)=>state.userInfo,
     getUserId:(state)=>state.userInfo.id,
-    getUserAvator:(state) => {
-      if(state.userInfo.avator){
-        return state.userInfo.avator
+    getUserAvatar:(state) => {
+      if(state.userInfo.avatar){
+        return state.userInfo.avatar
       }
-      return defaultAvator
+      return defaultAvatar
     },
     getRecordInfo:(state)=>state.recordInfo
   },

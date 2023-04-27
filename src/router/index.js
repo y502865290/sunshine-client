@@ -6,6 +6,8 @@ import SicknessDetail from '../views/SicknessDetail'
 import PersonalMain from '../views/personInfo/PersonalMain'
 import UserInfo from'../views/personInfo/UserInfo'
 import Test from '../views/Test'
+import Chat from '../views/chat/Index'
+import MessageBOX from '../views/chat/messageBox/Index';
 
 const routes = [
   {
@@ -39,6 +41,18 @@ const routes = [
     meta:{
       check:false
     }
+  },
+  {
+    path:'/chat',
+    name:'Chat',
+    component:Chat,
+    children:[
+      {
+        path:'message',
+        name:'Message',
+        component:MessageBOX
+      }
+    ]
   },
   {
     path: '/personalMain',
