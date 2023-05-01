@@ -28,27 +28,7 @@
 
 
       <t-button @click="getData">抓数据</t-button>
-      <t-dialog
-        header="抓数据"
-        close-btn=""
-        :onCancel="cancel"
-        :visible="getDataVisible"
-        width="70vw"
-        placement="20%"
-        :confirmBtn="null"
 
-      >
-            <span>导入</span>
-            <br/>
-            <span v-show="finish" style="color:blue">解析结果如下</span>
-            <t-textarea 
-                v-model="sourceData"
-                placeholder="请输入HTML源代码"
-                :autosize="{ maxRows:20, minRows:20 }"
-            />
-            <t-button style="margin-top: 15px;" @click="toPutInDatabase">导入数据库</t-button>
-            <t-button style="margin-left: 15px;margin-top: 15px;" @click="toAnalysis">解析HTML</t-button>
-      </t-dialog>
 </template>
 
 <script setup>
@@ -99,20 +79,5 @@
         return {url:response.data}
     }
 
-    const getDataVisible = ref(false)
-    const finish = ref(false)
-    const sourceData = ref()
-
-    const getData = () => {
-        getDataVisible.value = true
-    }
-
-    const cancel = () => {
-        getDataVisible.value = false
-    }
-
-    const toAnalysis = () => {
-
-    }
 
 </script>

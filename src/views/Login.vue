@@ -217,8 +217,18 @@
         localStorage.setItem('refreshToken',tokenInfo.refreshToken)
         localStorage.setItem('expiresTime',tokenInfo.expiresTime)
         store.commit('setUserInfo',JSON.parse(data.data))
-        store.commit('updateRecordInfo',{proxy,recall:go,store})
-        function go(){
+
+        if(store.getters.getUserInfo.type === 1){
+            store.commit('updateRecordInfo',{proxy,store,recall:toInitDoctorInfo})
+        }else{
+            store.commit('updateRecordInfo',{proxy,store,recall:goMain})
+        }
+
+        function toInitDoctorInfo(){
+            store.commit('updateDoctorInfo',{proxy,store,recall:goMain})
+        }
+        
+        function goMain(){
             router.push({name:'UserInfo'})
         }
         

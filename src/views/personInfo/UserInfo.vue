@@ -40,6 +40,66 @@
                 </t-row>
             </t-card>
 
+            <t-card class="user-info-list" title="医生基本信息" :bordered="false" v-if="store.getters.getUserInfo.type === 1">
+                <template #actions>
+                    <t-dropdown trigger="click" :min-column-width="120">
+                        <template #dropdown>
+                            <t-dropdown-menu>
+                                <t-dropdown-item @click="toUpdateUserInfo">
+                                    <t-icon name="edit-1"></t-icon>
+                                    修改医生信息
+                                </t-dropdown-item>
+                            </t-dropdown-menu>
+                        </template>
+                        <t-button theme="default" shape="square" variant="text">
+                            <t-icon name="edit-1" />
+                        </t-button>
+                    </t-dropdown>
+
+                </template>
+                <t-dropdown>
+                    <t-row>
+                        <t-col :span="3">
+                            <t-image 
+                                style="cursor: pointer;"
+                                :style="{ width: '13vh', height: '19vh' }"
+                                fit="fill"
+                                :src="defaultDoctor" />
+                        </t-col>
+                        <t-col :span="9">
+                            <t-row >
+                                <t-col :flex="1">
+                                    <div class="info-title">
+                                        姓名
+                                    </div>
+                                    <div class="info-content">
+                                        {{ store.getters.getDoctorInfo.name }}
+                                    </div>
+                                </t-col>
+                                <t-col :flex="2">
+                                    <div class="info-title">
+                                        身份证号
+                                    </div>
+                                    <div  class="info-content">
+                                        {{ store.getters.getDoctorInfo.idCard }}
+                                    </div>
+                                </t-col>
+                            </t-row>
+                            <t-row >
+                                <t-col style="margin-top: 3vh;" :span="12">
+                                    <div class="info-title">
+                                        所属
+                                    </div>
+                                    <div  class="info-content">
+                                       {{ store.getters.getDoctorInfo.hospital }}
+                                    </div>
+                                </t-col>
+                            </t-row>
+                        </t-col>
+                    </t-row>
+                </t-dropdown>
+            </t-card>
+
             <t-card class="user-info-list" title="医疗相关信息" :bordered="false">
                 <template #actions>
                     <t-dropdown trigger="click" :min-column-width="120">
@@ -127,8 +187,7 @@
              </t-card>
         </t-col>
     </t-row>
-    
-</div>
+    </div>
 
     <t-dialog
         header="更新用户信息"
@@ -173,7 +232,7 @@
         close-btn=""
         :onConfirm="onConfirmInit"
         :cancelBtn=null
-        top="20%"
+        top="0%"
     >
         <t-form
             :data="initInfo"
@@ -269,7 +328,7 @@
             ref="uploadImage"
             v-model="avatar"
             style="margin-left:10%;margin-right: 10%;"
-            action="http://localhost:7000/ums/user/uploadAvatar"
+            :action="userUrl + '/uploadAvatar'"
             theme="image"
             tips="头像上传"
             accept="image/*"
@@ -286,6 +345,49 @@
         </t-upload>
     </t-dialog>
 
+    <t-dialog
+        header="完善医生基本信息"
+        :visible="initDoctorInfoVisible"
+        close-btn=""
+        :onConfirm="onConfirmInitDoctor"
+        :cancelBtn=null
+        confirmBtn="提交审核"
+        top="10%"
+    >
+        <t-form
+            :data="initDoctorInfo"
+            ref="initDoctorInfoForm"
+            resetType="initial"
+            @submit="onSubmitInitDoctorInfo"
+            :rules="initDoctorRules"
+            
+        >
+            <t-form-item label="真实姓名" name="name">
+                <t-input placeholder="请输入内容" v-model="initDoctorInfo.name" />
+            </t-form-item>
+            <t-form-item label="身份证号" name="idCard">
+                <t-input placeholder="请输入内容" v-model="initDoctorInfo.idCard" />
+            </t-form-item>
+            <t-form-item label="所属医院">
+                <t-input placeholder="请输入内容" v-model="initDoctorInfo.hospital" />
+            </t-form-item>
+            <t-form-item label="证书">
+                <t-upload
+                    ref="initDoctorInfoUploadRef"
+                    :auto-upload="false"
+                    :action="doctorUrl + '/uploadCertificate'"
+                    v-model="doctorCertificate"
+                    :size-limit="{ size: 5, unit: 'MB' }"
+                    :upload-all-files-in-one-request="true"
+                    :onSuccess="onSuccessUploadCertificate"
+                    placeholder="请选择不大于5MB的图片"
+                    accept="image/*"
+                    :headers="getToken()"
+                />
+            </t-form-item>
+
+        </t-form>
+    </t-dialog>
     
 </template>
 <script setup>
@@ -293,6 +395,7 @@
     import { getCurrentInstance, reactive, ref, watch } from 'vue'
     import { useRouter } from "vue-router"
     import { MessagePlugin } from 'tdesign-vue-next'
+    import defaultDoctor from '@/assets/image/default-doctor.png';
 
     const store = useStore()
     const personalInfo = ref([])
@@ -300,6 +403,7 @@
     const proxy = getCurrentInstance().proxy
     const userUrl = proxy.$url.umsUserUrl
     const recordUrl = proxy.$url.umsRecordUrl
+    const doctorUrl = proxy.$url.umsDoctorUrl
 
     const initPersonalInfo = () => {
         const userInfo = store.getters.getUserInfo
@@ -582,6 +686,58 @@
         }
     }
 
+    const initDoctorInfoVisible = ref(
+        store.getters.getUserInfo.type === 2 ? false : store.getters.getDoctorInfo.init === 1 ? false : true
+        )
+    const initDoctorInfoUploadRef = ref(null)
+    const initDoctorInfoForm = ref(null)
+    const doctorCertificate = ref([])
+    const initDoctorInfo = reactive({
+        name:null,
+        user:null,
+        hospital:null,
+        idCard:null
+    })
+    const initDoctorRules = {
+        name:[
+            { required:true, message:'真实姓名必填', type:'error', trigger:'blur' },
+            { required:true, message:'真实姓名必填', type:'error', trigger:'change' }
+        ],
+        idCard:[
+            { required:true, message:'身份证必填', type:'error', trigger:'blur' },
+            { required:true, message:'身份证必填', type:'error', trigger:'change' }
+        ]
+    }
+    
+
+    const onSubmitInitDoctorInfo = ({validateResult, firstError, e}) => {
+        e.preventDefault()
+        if(validateResult === true){
+            initDoctorInfo.user = store.getters.getUserId
+            proxy.$axios.put(doctorUrl + '/addDoctorInfo',initDoctorInfo).then((res)=>{
+                const result = proxy.$analysisResult(proxy,res)
+                if(result.code === 1){
+                    if(doctorCertificate.value.length !== 0){
+                        initDoctorInfoUploadRef.value.uploadFiles()
+                    }else{
+                        onSuccessUploadCertificate()
+                    }
+                }
+            })
+        }else{
+            MessagePlugin.warning(firstError)
+        }
+    }
+
+    const onConfirmInitDoctor = () =>{
+        initDoctorInfoForm.value.submit()
+    }
+
+    const onSuccessUploadCertificate = () => {
+        initDoctorInfoVisible.value = false
+        store.commit('updateDoctorInfo',{store,proxy})
+    }
+
     watch(()=>store.state.recordInfo,()=>{
         initRecordInfo()
     })
@@ -594,3 +750,20 @@
 </script>
   
 <style src="@/assets/css/userInfo.css" scoped></style>
+<style scoped>
+.info-title{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font: var(--td-font-body-medium);
+    color: var(--td-text-color-placeholder);
+}
+.info-content{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-top: 1.5vh;
+    font: var(--td-font-body-medium);
+    color: var(--td-text-color-primary);
+}
+</style>

@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
-import Main from '../views/Main.vue'
-import Search from '../views/Search.vue'
-import SicknessDetail from '../views/SicknessDetail'
+import Main from '../views/search/Main'
+import Search from '../views/search/Search'
+import SicknessDetail from '../views/search/SicknessDetail'
 import PersonalMain from '../views/personInfo/PersonalMain'
 import UserInfo from'../views/personInfo/UserInfo'
 import Test from '../views/Test'
 import Chat from '../views/chat/Index'
-import MessageBOX from '../views/chat/messageBox/Index';
+import MessageBOX from '../views/chat/messageBox/Index'
+import Follow from '../views/personInfo/Follow'
 
 const routes = [
   {
@@ -66,6 +67,14 @@ const routes = [
         path: 'userInfo',
         name: 'UserInfo',
         component: UserInfo,
+        meta:{
+          check:true
+        }
+      },
+      {
+        path: 'follow',
+        name: 'Follow',
+        component: Follow,
         meta:{
           check:true
         }
